@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.util.List;
+
 @Configuration
 @PropertySource("classpath:other.properties")
 public class OtherConfig {
@@ -23,8 +25,16 @@ public class OtherConfig {
     private static String flagPwdTrap;
     private static String maxCounterToken;
     private static String osSplitting;//penambahan 20-12-2023
-
     private static String howToDownloadReport;//penambahan 07-01-2024
+    private static List<String> kataTerlarang;//penambahan 09-03-2024 untuk XSS saja
+
+    public static List<String> getKataTerlarang() {
+        return kataTerlarang;
+    }
+    @Value("#{'${kata.terlarang}'.split(',')}")
+    private void setKataTerlarang(List<String> kataTerlarang) {
+        OtherConfig.kataTerlarang = kataTerlarang;
+    }
 
     public static String getHowToDownloadReport() {
         return howToDownloadReport;
