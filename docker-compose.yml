@@ -1,0 +1,17 @@
+version : "3.8"
+services :
+  springcsr1 :
+    container_name : springcsr1
+    image : springcsrx:1.0
+    ports :
+      - 8084:8080
+
+    environment :
+      - HOST = host.docker.internal
+      - PORT = 1433
+      - DB_UNAME=sa
+      - DB_PWD=04314a220d233becd613f5d70d21dd78
+      - SHOW_SQL=true
+      - DDL_AUTO=update
+      - DB_SCHEMA = noquestion
+      - SVR_PORT = 8083
