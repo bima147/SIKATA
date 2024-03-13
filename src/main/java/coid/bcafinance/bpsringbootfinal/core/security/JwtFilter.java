@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RawHttpServletRequestWrapper rawRequest = new RawHttpServletRequestWrapper(request);
         try{
             /**
-             validasi khusus memilah request dengan content type application/json
+                validasi khusus memilah request dengan content type application/json
              */
             String strContentType = request.getContentType()==null?"":request.getContentType();
             if(!strContentType.startsWith("multipart/form-data") || "".equals(strContentType)){
@@ -88,8 +88,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     LoggingFile.exceptionStringz(strExceptionArr, new XSSAttackExcception("Serangan Hacker"), OtherConfig.getFlagLoging());
                     return;
                 }
-                request = requestWrapper;
             }
+            request = rawRequest;
 
             /**
              Langkah pertama otentikasi token
@@ -101,7 +101,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 /**
                  *  DECRYPT TOKEN DARI FRONT END
                  */
-                Crypto.performDecrypt(token);
+                token = Crypto.performDecrypt(token);
                 userName = jwtUtility.getUsernameFromToken(token);
                 if(userName != null &&
                         SecurityContextHolder.getContext().getAuthentication()==null)

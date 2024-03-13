@@ -85,8 +85,8 @@ public class CateringController {
             page = page==null?0:page;
             sortBy = (sortBy==null || sortBy.equals(""))?"id":sortBy;//penanda kalau null dari FE itu berarti kayak buka menu baru
             sort   = (sort==null || sort.equals("") || sort.equals("asc"))?"asc":"desc";// else = asc, karena bisa jadi dari FE dikirim bukan asc, walaupun sudah dijaga null value
-            filterBy = mapSorting.get(filterBy);
-            filterBy   = (filterBy==null || filterBy.equals("") || filterBy.equals("id"))?"cateringID":filterBy;// else = asc, karena bisa jadi dari FE dikirim bukan asc, walaupun sudah dijaga null value
+//            filterBy = mapSorting.get(filterBy);
+//            filterBy   = (filterBy==null || filterBy.equals("") || filterBy.equals("id"))?"cateringID":filterBy;// else = asc, karena bisa jadi dari FE dikirim bukan asc, walaupun sudah dijaga null value
 
             sortBy = mapSorting.get(sortBy);// id = cateringID, nama = namaCatering dst....
 //        pageable = PageRequest.of(page,Integer.parseInt(size.equals("")?"10":size));
