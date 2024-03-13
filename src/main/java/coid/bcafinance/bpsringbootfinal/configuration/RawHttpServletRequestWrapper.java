@@ -23,7 +23,7 @@ import java.io.*;
  */
 public class RawHttpServletRequestWrapper extends HttpServletRequestWrapper { //diubah
     private final String body;
-    private String [] strExceptionArr = {"MyHttpServletRequestWrapper",""};
+    private String [] strExceptionArr = {"RawHttpServletRequestWrapper",""};
     public RawHttpServletRequestWrapper(HttpServletRequest request) {
         /** agar request dikembalikan ke semula*/
         super(request);

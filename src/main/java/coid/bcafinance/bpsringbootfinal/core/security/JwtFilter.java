@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
         RawHttpServletRequestWrapper rawRequest = new RawHttpServletRequestWrapper(request);
         try{
             /**
-             validasi khusus memilah request dengan content type application/json
+                validasi khusus memilah request dengan content type application/json
              */
             String strContentType = request.getContentType()==null?"":request.getContentType();
             if(!strContentType.startsWith("multipart/form-data") || "".equals(strContentType)){
@@ -88,12 +88,13 @@ public class JwtFilter extends OncePerRequestFilter {
                     LoggingFile.exceptionStringz(strExceptionArr, new XSSAttackExcception("Serangan Hacker"), OtherConfig.getFlagLoging());
                     return;
                 }
-                request = requestWrapper;
             }
+            request = rawRequest;
 
             /**
              Langkah pertama otentikasi token
              */
+//            authorization = Crypto.performDecrypt("9f33a5c2b32fd796d6ab7cd33e762d92dc6f57c6d691127c2f212265a63bdc47fb9c44d8f1cb61b46a1a6898dd72bd28173e79c8e1bed2e5cfaf17dc9c9c6064fc6441f20be9e6ce4482cfa22ef1707dd88e4b233803793f79d5df8ff87b31847eea122f73d50718cab1151bcbfec545bab52fe08ed14abed83250d9360088fd594a55b687a66bf9a4e4691f8205a3ddd88339422a2a1dcf7f2a867b505a180d7ce612c15d70abd4b522dff66d3ab5c77fa5a093319b90af931c8ddda66b2f260c3b7d2ed5582b07f8c311f0c3734b98f2f38e20fd76d0393f64069b4f3cce541f75689ae61de417059b20f6b8b0e4b913ee90e28e58ebc008cdb74ec479e90c4ed5a9d16edcfe7a0ac402b3975d6976");
             if(!"".equals(authorization) && authorization.startsWith("Bearer ") && authorization.length()>7)
             {
                 token = authorization.substring(7);//memotong setelah kata Bearer+spasi = 7 digit
@@ -101,7 +102,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 /**
                  *  DECRYPT TOKEN DARI FRONT END
                  */
-                Crypto.performDecrypt(token);
+                token = Crypto.performDecrypt(token);
                 userName = jwtUtility.getUsernameFromToken(token);
                 if(userName != null &&
                         SecurityContextHolder.getContext().getAuthentication()==null)
