@@ -12,6 +12,8 @@ Version 1.0
 
 import coid.bcafinance.bpsringbootfinal.configuration.OtherConfig;
 import coid.bcafinance.bpsringbootfinal.core.IService;
+import coid.bcafinance.bpsringbootfinal.dto.SearchParamDTO;
+import coid.bcafinance.bpsringbootfinal.dto.catering.CateringDetailDTO;
 import coid.bcafinance.bpsringbootfinal.dto.location.LocationDTO;
 import coid.bcafinance.bpsringbootfinal.handler.RequestCapture;
 import coid.bcafinance.bpsringbootfinal.handler.ResponseHandler;
@@ -22,6 +24,7 @@ import coid.bcafinance.bpsringbootfinal.util.TransformToDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,18 +46,13 @@ import java.util.*;
 public class LocationService implements IService<Location> {
     @Autowired
     private LocationRepo locationRepo;
-
     @Autowired
     private ModelMapper modelMapper;
-
     private Location location = null;
-
     private String [] strExceptionArr = new String[2];
-
     Map<String,Object> mapColum = new HashMap<>();
-
     TransformToDTO transformToDTO = new TransformToDTO();
-
+    private List<SearchParamDTO> listSearchParamDTO  = new ArrayList<>();
     Map<String,Object> mapResult = new HashMap<>();
 
     public LocationService(LocationRepo locationRepo) {
@@ -79,7 +77,7 @@ public class LocationService implements IService<Location> {
         try{
             /*
                 Audit Trails untuk id User nanti disini
-                catering.setCreatedBy(1L); // id dari token JWT
+                location.setCreatedBy(1L); // id dari token JWT
              */
             LocationDTO saved =
                     modelMapper.map(locationRepo.save(location), new TypeToken<LocationDTO>() {}.getType());
@@ -89,7 +87,7 @@ public class LocationService implements IService<Location> {
                     null, request);
         } catch (Exception e)
         {
-            strExceptionArr[1] = "save(Location location, HttpServletRequest request) LINE 68"+ RequestCapture.allRequest(request) ;
+            strExceptionArr[1] = "save(Location location, HttpServletRequest request) LINE 66"+ RequestCapture.allRequest(request) ;
             LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
             return new ResponseHandler().generateResponse("Data Gagal Disimpan !! ",
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -125,7 +123,7 @@ public class LocationService implements IService<Location> {
 //            locationRepo.save(catering);
         }catch (Exception e)
         {
-            strExceptionArr[1] = "saveBatch(List<Location> lt, HttpServletRequest request) LINE 105"+ RequestCapture.allRequest(request) ;
+            strExceptionArr[1] = "saveBatch(List<Location> lt, HttpServletRequest request) LINE 102"+ RequestCapture.allRequest(request) ;
             LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
             return new ResponseHandler().generateResponse("Data Gagal Disimpan !! ",
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -162,7 +160,7 @@ public class LocationService implements IService<Location> {
                     locationDTO,
                     null, request);
         } catch (Exception e) {
-            strExceptionArr[1] = "edit(Long id, Location location, HttpServletRequest request) LINE 140"+ RequestCapture.allRequest(request) ;
+            strExceptionArr[1] = "edit(Long id, Location location, HttpServletRequest request) LINE 138"+ RequestCapture.allRequest(request) ;
             LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
             return new ResponseHandler().generateResponse("Data Gagal Disimpan !! ",
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -187,7 +185,7 @@ public class LocationService implements IService<Location> {
                     null,
                     null, request);
         } catch (Exception e) {
-            strExceptionArr[1] = "delete(Long id, HttpServletRequest request) LINE 177"+ RequestCapture.allRequest(request) ;
+            strExceptionArr[1] = "delete(Long id, HttpServletRequest request) LINE 175"+ RequestCapture.allRequest(request) ;
             LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
             return new ResponseHandler().generateResponse("Data Gagal Dihapus !! ",
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -198,16 +196,110 @@ public class LocationService implements IService<Location> {
 
     @Override
     public ResponseEntity<Object> findById(Long id, HttpServletRequest request) {
-        return null;
+        try {
+            Optional<Location> getData = locationRepo.findById(id);
+            if (getData.isEmpty()) {
+                return new ResponseHandler().generateResponse("Data Tidak Ditemukan",
+                        HttpStatus.BAD_REQUEST,
+                        null,
+                        "FV03005", request);//FAILED VALIDATION
+            }
+            LocationDTO locationDTO =
+                    modelMapper.map(getData, new TypeToken<CateringDetailDTO>() {}.getType());
+            return new ResponseHandler().generateResponse("Berhasil Mendapatkan Data!!",
+                    HttpStatus.OK,
+                    locationDTO,
+                    null, request);
+        } catch (Exception e) {
+            strExceptionArr[1] = "findById(Long id, HttpServletRequest request) LINE 200"+ RequestCapture.allRequest(request) ;
+            LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
+            return new ResponseHandler().generateResponse("Data Gagal Didapatkan !! ",
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    null,
+                    "FE03005", request);//FAILED ERROR
+        }
     }
 
     @Override
-    public ResponseEntity<Object> find(Pageable pageable, String columFirst, String valueFirst, HttpServletRequest request) {
-        return null;
+    public ResponseEntity<Object> find(Pageable pageable,
+                                       String columFirst,
+                                       String valueFirst,
+                                       HttpServletRequest request) {
+        Page<Location> pageLocation = null;
+        List<Location> listLocation = null;
+
+        if(columFirst.equals("id"))
+        {
+            if(!valueFirst.equals("") && valueFirst!=null)
+            {
+                try
+                {
+                        /*
+                            UNTUK ID YANG BER TIPE NUMERIC
+                            TIDAK PERLU DIGUNAKAN JIKA ID BER TIPE STRING
+                         */
+                    Long.parseLong(valueFirst);
+                }
+                catch (Exception e)
+                {
+                    strExceptionArr[1] = "find(Pageable pageable, String columFirst, String valueFirst, HttpServletRequest request) --- LINE 230";
+                    LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
+                    return new ResponseHandler().
+                            generateResponse("DATA FILTER TIDAK SESUAI FORMAT HARUS ANGKA",
+                                    HttpStatus.INTERNAL_SERVER_ERROR,
+                                    null,//perubahan 21-12-2023
+                                    "X-99-001",
+                                    request);
+                }
+            }
+        }
+
+        pageLocation = getDataByValue(pageable,columFirst,valueFirst);
+        listLocation = pageLocation.getContent();
+        if(listLocation.isEmpty())
+        {
+            return new ResponseHandler().
+                    generateResponse("DATA TIDAK DITEMUKAN",
+                            HttpStatus.NOT_FOUND,
+                            null,//perubahan 21-12-2023
+                            "X-99-002",
+                            request);
+        }
+        List<LocationDTO>  ltLocationDTO =
+                modelMapper.map(listLocation, new TypeToken<List<LocationDTO>>() {}.getType());
+        mapResult = transformToDTO.transformObject(mapResult,
+                ltLocationDTO,
+                pageLocation,
+                columFirst,
+                valueFirst,
+                listSearchParamDTO);
+
+        return  new ResponseHandler().
+                generateResponse("OK",
+                        HttpStatus.OK,
+                        mapResult,
+                        null,
+                        request);
     }
 
     @Override
     public ResponseEntity<Object> dataToExport(MultipartFile multipartFile, HttpServletRequest request) {
         return null;
+    }
+
+    private Page<Location> getDataByValue(Pageable pageable, String columnFirst, String valueFirst)
+    {
+        if(valueFirst.equals("") || valueFirst==null)
+        {
+            return locationRepo.findByLocationID(pageable,valueFirst);
+        }
+        if(columnFirst.equals("id"))
+        {
+            return locationRepo.findByLocationID(pageable,valueFirst);
+        } else if (columnFirst.equals("nama")) {
+            return locationRepo.findByProvinceContainingIgnoreCase(pageable,valueFirst);
+        }
+
+        return locationRepo.findByLocationID(pageable,valueFirst);// ini default kalau parameter search nya tidak sesuai--- asumsi nya di hit bukan dari web
     }
 }

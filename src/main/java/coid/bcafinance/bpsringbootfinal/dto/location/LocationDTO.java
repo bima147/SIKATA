@@ -12,6 +12,7 @@ Version 1.0
 
 import coid.bcafinance.bpsringbootfinal.model.Catering;
 import coid.bcafinance.bpsringbootfinal.model.Countries;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class LocationDTO {
+    @JsonIgnore
     public Long locationID;
     @NotNull(message = "ID Catering tidak boleh kosong")
     public Catering cateringID;
@@ -41,6 +43,20 @@ public class LocationDTO {
     @NotBlank(message = "Kota tidak boleh blank")
     public String city;
     public Integer limit;
+    /**
+     * Start Group Audit Trails
+     */
+    @JsonIgnore
+    public Long createdBy = 1L;
+    @JsonIgnore
+    public Long updatedBy;
+    @JsonIgnore
+    public Date createdAt;
+    @JsonIgnore
+    public Date updatedAt;
+    /**
+     * End Group Audit Trails
+     */
 
     public Long getLocationID() {
         return locationID;
@@ -104,5 +120,37 @@ public class LocationDTO {
 
     public void setLimit(Integer limit) {
         this.limit = limit;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Long getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

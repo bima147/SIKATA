@@ -246,8 +246,8 @@ public class CateringService implements IService<Catering> {
                 }
                 catch (Exception e)
                 {
-//                    strExceptionArr[1] = "find(Pageable pageable, String columFirst, String valueFirst, HttpServletRequest request) --- LINE 252";
-//                    LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
+                    strExceptionArr[1] = "find(Pageable pageable, String columFirst, String valueFirst, HttpServletRequest request) --- LINE 238";
+                    LoggingFile.exceptionStringz(strExceptionArr, e, OtherConfig.getFlagLoging());
                     return new ResponseHandler().
                             generateResponse("DATA FILTER TIDAK SESUAI FORMAT HARUS ANGKA",
                                     HttpStatus.INTERNAL_SERVER_ERROR,
